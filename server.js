@@ -1,3 +1,4 @@
+import { getAllOrganizations } from './src/models/organizations.js';
 import { testConnection } from './src/models/db.js';
 import express from 'express';
 import { fileURLToPath } from 'url';
@@ -40,11 +41,13 @@ app.get('/organizations', async (req, res) => {
     res.render('organizations', { title });
 });
 
-app.get('/projects', async (req, res) => {
-    const title = 'Service Projects';
-    res.render('projects', { title });
-});
+app.get('/organizations', async (req, res) => {
+    const organizations = await getAllOrganizations();
+    console.log(organizations);
 
+    const title = 'Our Partner Organizations';
+    res.render('organizations', { title });
+});
 app.listen(PORT, async () => {
     try {
         await testConnection();
