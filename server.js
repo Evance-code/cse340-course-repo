@@ -43,10 +43,8 @@ app.get('/organizations', async (req, res) => {
 
 app.get('/organizations', async (req, res) => {
     const organizations = await getAllOrganizations();
-    console.log(organizations);
-
     const title = 'Our Partner Organizations';
-    res.render('organizations', { title });
+    res.render('organizations', { title, organizations });
 });
 app.listen(PORT, async () => {
     try {
