@@ -2,40 +2,47 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import session from 'express-session';
+import flash from 'connect-flash';
 import { testConnection } from './src/models/db.js';
 import router from './src/routes.js';
-import flash from './src/middleware/flash.js';
 
+// Define the the application environment
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
+
+// Define the port number the server will listen on
 const PORT = process.env.PORT || 3000;
-const SESSION_SECRET = process.env.SESSION_SECRET;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Set up session management
-app.use(session({
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 60 * 60 * 1000 }
-}));
-
-// Use flash message middleware
-app.use(flash);
-
-// Allow Express to receive and process common POST data
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+/**
+  * Configure Express middleware
+  */
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set EJS as the templating engine
 app.set('view engine', 'ejs');
+
+// Tell Express where to find your templates
 app.set('views', path.join(__dirname, 'src/views'));
+
+// Parse URL-encoded bodies (form submissions)
+app.use(express.urlencoded({ extended: true }));
+
+// Session middleware
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'cse340secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }
+}));
+
+// Flash middleware
+app.use(flash());
 
 // Middleware to log all incoming requests
 app.use((req, res, next) => {
@@ -45,15 +52,22 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware to make NODE_ENV available to all templates
+// Middleware to make NODE_ENV and flash messages available to all templates
 app.use((req, res, next) => {
+    res.locals.isLoggedIn = false;
+    if (req.session && req.session.user) {
+        res.locals.isLoggedIn = true;
+    }
+    res.locals.user = req.session ? req.session.user : null;
     res.locals.NODE_ENV = NODE_ENV;
+    res.locals.messages = req.flash();
     next();
 });
 
+// Use the imported router to handle routes
 app.use(router);
 
-// 404 handler
+// Catch-all route for 404 errors
 app.use((req, res, next) => {
     const err = new Error('Page Not Found');
     err.status = 404;
