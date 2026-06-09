@@ -47,9 +47,12 @@ const processLoginForm = async (req, res) => {
 
 // Process logout
 const processLogout = (req, res) => {
-    req.session.destroy();
-    req.flash('success', 'You have been logged out.');
-    res.redirect('/login');
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+        }
+        res.redirect('/login');
+    });
 };
 
 // Show dashboard
