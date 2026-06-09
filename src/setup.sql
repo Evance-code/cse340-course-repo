@@ -105,3 +105,15 @@ CREATE TABLE users (
     role_id INTEGER REFERENCES roles(role_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+-- Create volunteer table
+CREATE TABLE volunteer (
+    volunteer_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    project_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, project_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (project_id) REFERENCES project(project_id)
+);

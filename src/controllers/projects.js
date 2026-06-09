@@ -1,7 +1,8 @@
-import { body, validationResult } from 'express-validator';
-import { getUpcomingProjects, getProjectDetails, createProject, updateProject } from '../models/projects.js';
+import { getAllProjects, getUpcomingProjects, getProjectDetails, getProjectsByOrganizationId, createProject, updateProject } from '../models/projects.js';
 import { getCategoriesByProjectId } from '../models/categories.js';
 import { getAllOrganizations } from '../models/organizations.js';
+import { isUserVolunteering } from '../models/volunteers.js';
+import { body, validationResult } from 'express-validator';
 
 const NUMBER_OF_UPCOMING_PROJECTS = 5;
 
@@ -16,7 +17,13 @@ const showProjectDetailsPage = async (req, res) => {
     const project = await getProjectDetails(id);
     const categories = await getCategoriesByProjectId(id);
     const title = project.title;
-    res.render('project', { title, project, categories });
+
+    let isVolunteering = false;
+    if (req.session && req.session.user) {
+        isVolunteering = await isUserVolunteering(req.session.user.user_id, id);
+    }
+
+    res.render('project', { title, project, categories, isVolunteering });
 };
 
 const showNewProjectForm = async (req, res) => {
@@ -72,7 +79,6 @@ const processNewProjectForm = async (req, res) => {
         });
         return res.redirect('/new-project');
     }
-
     const { title, description, location, date, organizationId } = req.body;
     await createProject(title, description, location, date, organizationId);
     req.flash('success', 'Service project added successfully!');
@@ -81,7 +87,6 @@ const processNewProjectForm = async (req, res) => {
 
 const processEditProjectForm = async (req, res) => {
     const id = req.params.id;
-
     const results = validationResult(req);
     if (!results.isEmpty()) {
         results.array().forEach((error) => {
@@ -89,7 +94,6 @@ const processEditProjectForm = async (req, res) => {
         });
         return res.redirect(`/edit-project/${id}`);
     }
-
     const { title, description, location, date, organizationId } = req.body;
     await updateProject(id, title, description, location, date, organizationId);
     req.flash('success', 'Service project updated successfully!');

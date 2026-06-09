@@ -41,6 +41,11 @@ import {
     requireLogin,
     requireRole
 } from './controllers/users.js';
+import {
+    processAddVolunteer,
+    processRemoveVolunteer,
+    showVolunteeringPage
+} from './controllers/volunteers.js';
 
 const router = express.Router();
 
@@ -62,6 +67,11 @@ router.get('/logout', processLogout);
 // Protected routes
 router.get('/dashboard', requireLogin, showDashboard);
 router.get('/users', requireLogin, requireRole('admin'), showUsersPage);
+router.get('/volunteering', requireLogin, showVolunteeringPage);
+
+// Volunteer routes
+router.post('/project/:projectId/volunteer', requireLogin, processAddVolunteer);
+router.post('/project/:projectId/unvolunteer', requireLogin, processRemoveVolunteer);
 
 // Admin organization routes
 router.get('/new-organization', requireLogin, requireRole('admin'), showNewOrganizationForm);

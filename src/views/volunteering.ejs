@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+    <main>
+        <h1>
+            <%= title %>
+        </h1>
+
+        <% if (messages.success) { %>
+            <% messages.success.forEach(msg=> { %>
+                <p style="color:green">
+                    <%= msg %>
+                </p>
+                <% }) %>
+                    <% } %>
+
+                        <% if (projects.length===0) { %>
+                            <p>You have not volunteered for any projects yet.</p>
+                            <p><a href="/projects">Browse upcoming projects</a></p>
+                            <% } else { %>
+                                <ul>
+                                    <% projects.forEach(project=> { %>
+                                        <li>
+                                            <a href="/project/<%= project.project_id %>">
+                                                <%= project.title %>
+                                            </a>
+                                            - <%= new Date(project.date).toLocaleDateString('en-US', { year: 'numeric' ,
+                                                month: 'long' , day: 'numeric' }) %>
+                                                - <a href="/organization/<%= project.organization_id %>">
+                                                    <%= project.organization_name %>
+                                                </a>
+                                                <form method="POST"
+                                                    action="/project/<%= project.project_id %>/unvolunteer"
+                                                    style="display:inline">
+                                                    <button type="submit">Remove</button>
+                                                </form>
+                                        </li>
+                                        <% }) %>
+                                </ul>
+                                <% } %>
+    </main>
+
+    <%- include('partials/footer') %>
