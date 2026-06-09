@@ -56,11 +56,9 @@ const createProject = async (title, description, location, date, organizationId)
         RETURNING project_id
     `;
     const result = await db.query(query, [title, description, location, date, organizationId]);
-
     if (result.rows.length === 0) {
         throw new Error('Failed to create project');
     }
-
     return result.rows[0].project_id;
 };
 
@@ -72,11 +70,9 @@ const updateProject = async (id, title, description, location, date, organizatio
         RETURNING project_id
     `;
     const result = await db.query(query, [title, description, location, date, organizationId, id]);
-
     if (result.rows.length === 0) {
         throw new Error('Failed to update project');
     }
-
     return result.rows[0].project_id;
 };
 

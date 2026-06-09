@@ -26,21 +26,20 @@
 
         <% if (categories && categories.length> 0) { %>
             <p><strong>Categories:</strong></p>
-            <ul class="category-tags">
+            <ul>
                 <% categories.forEach(category=> { %>
                     <li>
-                        <a href="/category/<%= category.category_id %>" class="category-tag">
-                            <%= category.name %>
-                        </a>
+                        <%= category.name %>
                     </li>
                     <% }) %>
             </ul>
             <% } %>
 
-                <p>
-                    <a href="/edit-project/<%= project.project_id %>">Edit Project</a> |
-                    <a href="/project/<%= project.project_id %>/assign-categories">Edit Categories</a>
-                </p>
+                <% if (user && user.role_name==='admin' ) { %>
+                    <p>
+                        <a href="/edit-project/<%= project.project_id %>">Edit Project</a>
+                    </p>
+                    <% } %>
     </main>
 
     <%- include('partials/footer') %>

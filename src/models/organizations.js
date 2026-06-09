@@ -26,11 +26,9 @@ const createOrganization = async (name, description, contactEmail, logoFilename)
         RETURNING organization_id
     `;
     const result = await db.query(query, [name, description, contactEmail, logoFilename]);
-
     if (result.rows.length === 0) {
         throw new Error('Failed to create organization');
     }
-
     return result.rows[0].organization_id;
 };
 
@@ -42,11 +40,9 @@ const updateOrganization = async (id, name, description, contactEmail, logoFilen
         RETURNING organization_id
     `;
     const result = await db.query(query, [name, description, contactEmail, logoFilename, id]);
-
     if (result.rows.length === 0) {
         throw new Error('Failed to update organization');
     }
-
     return result.rows[0].organization_id;
 };
 
